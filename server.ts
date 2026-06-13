@@ -3,12 +3,14 @@ import path from "path";
 import { PrismaClient } from "@prisma/client";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import { generateTermoPDF } from "./src/utils/pdfHelper";
 
 const prisma = new PrismaClient();
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use("/public/termos", express.static(path.join(process.cwd(), "public", "termos")));
 
 // API Routes
 
@@ -102,7 +104,27 @@ app.put("/api/tasks/:id", async (req, res) => {
         user: true
       }
     });
-    res.json(updated);
+
+    let pdfUrl: string | undefined = undefined;
+    if (updated.status === "DONE" && updated.user) {
+      try {
+        pdfUrl = await generateTermoPDF(
+          updated.id,
+          updated.title,
+          updated.description || "",
+          updated.user.name,
+          updated.user.role,
+          updated.dueDate.toLocaleDateString("pt-BR")
+        );
+      } catch (pdfErr) {
+        console.error("Error generating PDF:", pdfErr);
+      }
+    }
+
+    res.json({
+      ...updated,
+      pdfUrl
+    });
   } catch (error) {
     console.error("Error updating task:", error);
     res.status(500).json({ error: "Erro ao atualizar tarefa" });

@@ -15,7 +15,10 @@ import {
   Briefcase,
   AlertTriangle,
   Sparkles,
-  Network
+  Network,
+  FileText,
+  Download,
+  X
 } from "lucide-react";
 
 export default function App() {
@@ -27,6 +30,7 @@ export default function App() {
   const [briefing, setBriefing] = useState<string | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"kanban" | "topology">("kanban");
+  const [downloadToast, setDownloadToast] = useState<{ id: string; title: string; url: string; userName: string } | null>(null);
 
   // Formatting helper for markdown-style bold tags in the briefing
   const formatBriefingText = (text: string) => {
@@ -108,6 +112,16 @@ export default function App() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (!res.ok) throw new Error("Falha ao atualizar status da tarefa");
+      const updatedData = await res.json();
+
+      if (updatedData.pdfUrl) {
+        setDownloadToast({
+          id: updatedData.id,
+          title: updatedData.title,
+          url: updatedData.pdfUrl,
+          userName: updatedData.user?.name || "Colaborador"
+        });
+      }
       
       // Instantly refresh
       await fetchData();
@@ -133,6 +147,16 @@ export default function App() {
           body: JSON.stringify(data),
         });
         if (!res.ok) throw new Error("Falha ao atualizar tarefa");
+        const updatedData = await res.json();
+
+        if (updatedData.pdfUrl) {
+          setDownloadToast({
+            id: updatedData.id,
+            title: updatedData.title,
+            url: updatedData.pdfUrl,
+            userName: updatedData.user?.name || "Colaborador"
+          });
+        }
       } else {
         // Create Mode
         const res = await fetch("/api/tasks", {
@@ -231,6 +255,44 @@ export default function App() {
             >
               Fechar
             </button>
+          </div>
+        )}
+
+        {/* Document Automation Download Alert Banner */}
+        {downloadToast && (
+          <div className="rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50/40 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-emerald-600 text-white rounded-lg shadow-sm shrink-0">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                  ✨ Kanban Inteligente: Termo de Conclusão Gerado!
+                </h4>
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                  O sistema gerou o <strong>Termo de Responsabilidade e Conclusão</strong> em PDF para a atividade <span className="font-semibold text-slate-805">"{downloadToast.title}"</span> resolvida sob a autoria de <strong>{downloadToast.userName}</strong>.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2.5 self-end md:self-auto">
+              <a
+                href={downloadToast.url}
+                download={`termo-${downloadToast.id}.pdf`}
+                target="_blank"
+                rel="noreferrer"
+                className="px-3.5 py-1.5 text-xs font-extrabold bg-slate-900 hover:bg-slate-800 text-white rounded-lg flex items-center gap-1.5 shadow-xs transition duration-150 cursor-pointer"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Salvar Documento</span>
+              </a>
+              <button
+                onClick={() => setDownloadToast(null)}
+                className="p-1 px-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
 
