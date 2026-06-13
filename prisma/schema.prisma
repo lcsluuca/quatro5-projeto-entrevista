@@ -27,6 +27,7 @@ model Task {
   description String
   status      String   // "TODO" (A Fazer), "IN_PROGRESS" (Em Andamento), "DONE" (Concluído)
   dueDate     DateTime
+  isHighImpact Boolean  @default(false)
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   startedAt   DateTime?

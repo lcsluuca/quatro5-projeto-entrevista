@@ -168,7 +168,7 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
   const focusedTask = activeTasks.find(t => t.id === selectedTaskId);
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col">
+    <div className="rounded-xl border border-slate-200 dark:border-slate-850 bg-white dark:bg-slate-900 shadow-sm overflow-hidden flex flex-col transition-colors">
       {/* Topology CSS Variables injection */}
       <style>{`
         @keyframes network-pulse-red {
@@ -207,15 +207,15 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
       `}</style>
 
       {/* Control Header */}
-      <div className="border-b border-slate-200 bg-slate-50/50 px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="border-b border-slate-200 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-colors">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1 rounded bg-blue-100 text-blue-600">
+            <span className="p-1 rounded bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">
               <Network className="h-4 w-4" />
             </span>
-            <h3 className="text-sm font-bold text-slate-800">Topologia de Rede do Fluxo (WIP Latency)</h3>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Topologia de Rede do Fluxo (WIP Latency)</h3>
           </div>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
             Visualize o fluxo operacional como infraestrutura. Arraste os membros da equipe (gargalos em vermelho) para reorganizar a rede.
           </p>
         </div>
@@ -223,16 +223,16 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
         {/* Filters and Toggle buttons */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Status selector */}
-          <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg p-0.5 shadow-xs">
-            <span className="text-[10px] text-slate-400 font-bold px-2 uppercase">Filtrar satélites:</span>
+          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-0.5 shadow-xs transition-colors">
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold px-2 uppercase">Filtrar satélites:</span>
             {(["ALL", "TODO", "IN_PROGRESS", "DONE"] as const).map((status) => (
               <button
                 key={status}
                 onClick={() => setFilterStatus(status)}
                 className={`px-2 py-1 text-[10px] font-bold rounded-md transition cursor-pointer ${
                   filterStatus === status 
-                    ? "bg-slate-800 text-white" 
-                    : "text-slate-600 hover:bg-slate-100"
+                    ? "bg-slate-800 dark:bg-slate-700 text-white" 
+                    : "text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
                 }`}
               >
                 {status === "ALL" ? "Todos" : status === "TODO" ? "A Fazer" : status === "IN_PROGRESS" ? "Em WIP" : "Pronto"}
@@ -241,13 +241,13 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
           </div>
 
           {/* Alert Threshold Slider */}
-          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-[10px] font-bold text-slate-600 shadow-xs">
-            <SlidersHorizontal className="h-3 w-3 text-slate-400" />
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:text-slate-400 shadow-xs transition-colors">
+            <SlidersHorizontal className="h-3 w-3 text-slate-400 " />
             <span>Limite Vermelho (WIP): </span>
             <select
               value={alertThreshold}
               onChange={(e) => setAlertThreshold(Number(e.target.value))}
-              className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[10px] text-slate-700 font-bold focus:outline-none"
+              className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] text-slate-700 dark:text-slate-300 font-bold focus:outline-none"
             >
               {[2, 3, 4, 5, 6].map(v => (
                 <option key={v} value={v}>{v} tarefas</option>
@@ -264,7 +264,7 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs ${
               isDemoMode 
                 ? "bg-rose-500 hover:bg-rose-600 text-white" 
-                : "bg-slate-200/80 hover:bg-slate-300/90 text-slate-700"
+                : "bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300/90 dark:hover:bg-slate-700 text-slate-705 dark:text-slate-300"
             }`}
             title="Clique para alternar para um estado com dados fictícios sobrecarregados"
           >
@@ -451,15 +451,15 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
           })}
         </div>
 
-        {/* DETAILS SIDEBAR PANEL (1/4 Width) */}
-        <div className="lg:col-span-1 bg-slate-50 p-4 border-t lg:border-t-0 flex flex-col justify-between max-h-[480px] overflow-y-auto">
+               {/* DETAILS SIDEBAR PANEL (1/4 Width) */}
+        <div className="lg:col-span-1 bg-slate-50 dark:bg-slate-950 p-4 border-t lg:border-t-0 border-slate-200 dark:border-slate-800 flex flex-col justify-between max-h-[480px] overflow-y-auto transition-colors">
           <div className="space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Gargalos e Diagnósticos</span>
               {selectedNodeId && (
                 <button 
                   onClick={cleanSelectedId}
-                  className="text-[9px] text-slate-500 hover:text-slate-800 underline font-bold cursor-pointer"
+                  className="text-[9px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 underline font-bold cursor-pointer transition-colors"
                 >
                   Limpar
                 </button>
@@ -469,30 +469,30 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
             {/* If Task details selected */}
             {selectedNodeType === "task" && focusedTask && (
               <div className="space-y-3">
-                <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-2 transition-colors">
                   <div className="flex items-center justify-between">
-                    <span className="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 uppercase font-bold">{focusedTask.status}</span>
-                    <span className="text-[9px] text-slate-400 font-mono">ID: {focusedTask.id}</span>
+                    <span className="text-[9px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-650 dark:text-slate-300 uppercase font-bold">{focusedTask.status}</span>
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">ID: {focusedTask.id}</span>
                   </div>
                   
-                  <h4 className="text-xs font-bold text-slate-800 leading-tight">{focusedTask.title}</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">{focusedTask.title}</h4>
                   
                   {focusedTask.description && (
-                    <p className="text-[11px] text-slate-500 leading-normal">{focusedTask.description}</p>
+                    <p className="text-[11px] text-slate-505 dark:text-slate-400 leading-normal">{focusedTask.description}</p>
                   )}
                   
-                  <div className="border-t border-slate-100 pt-2 flex items-center justify-between text-[10px] text-slate-500">
+                  <div className="border-t border-slate-100 dark:border-slate-800 pt-2 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-405">
                     <span>Responsável:</span>
-                    <span className="font-bold text-slate-700">{focusedTask.user?.name}</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300">{focusedTask.user?.name}</span>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-405">
                     <span>Prazo (SLA):</span>
-                    <span className="font-bold text-slate-700">{focusedTask.dueDate}</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300">{focusedTask.dueDate}</span>
                   </div>
                 </div>
 
-                <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl">
-                  <p className="text-[10px] text-blue-700 italic leading-relaxed">
+                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-xl">
+                  <p className="text-[10px] text-blue-700 dark:text-blue-300 italic leading-relaxed">
                     💡 <strong>Ação de Tática:</strong> Você pode transferir esta tarefa de {focusedTask.user?.name} para um membro com carga mais saudável na tabela do Kanban.
                   </p>
                 </div>
@@ -502,7 +502,7 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
             {/* If User node details selected */}
             {selectedNodeType === "user" && focusedUser && (
               <div className="space-y-3">
-                <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+                <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-2.5 transition-colors">
                   <div className="flex items-center gap-2">
                     <div 
                       className="h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-xs"
@@ -511,46 +511,46 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
                       {focusedUser.name.split(" ").map(n=>n[0]).slice(0,2).join("").toUpperCase()}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-800">{focusedUser.name}</h4>
-                      <p className="text-[10px] text-slate-400 font-mono">{focusedUser.role}</p>
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">{focusedUser.name}</h4>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{focusedUser.role}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-1.5 pt-1 text-center">
-                    <div className="bg-slate-50 p-1.5 rounded border border-slate-100">
-                      <div className="text-xs font-black text-slate-700">
+                    <div className="bg-slate-50 dark:bg-slate-950 p-1.5 rounded border border-slate-100 dark:border-slate-800">
+                      <div className="text-xs font-black text-slate-700 dark:text-slate-300">
                         {focusedUserTasks.filter(t=>t.status === "TODO").length}
                       </div>
-                      <div className="text-[8px] text-slate-400 font-bold uppercase">A Fazer</div>
+                      <div className="text-[8px] text-slate-400 dark:text-slate-500 font-bold uppercase">A Fazer</div>
                     </div>
-                    <div className="bg-blue-50/50 p-1.5 rounded border border-blue-100/50">
-                      <div className="text-xs font-black text-blue-600">
+                    <div className="bg-blue-50/50 dark:bg-blue-950/20 p-1.5 rounded border border-blue-100/50 dark:border-blue-900/30">
+                      <div className="text-xs font-black text-blue-600 dark:text-blue-400">
                         {focusedUserTasks.filter(t=>t.status === "IN_PROGRESS").length}
                       </div>
-                      <div className="text-[8px] text-blue-500 font-bold uppercase">WIP</div>
+                      <div className="text-[8px] text-blue-500 dark:text-blue-450 font-bold uppercase">WIP</div>
                     </div>
-                    <div className="bg-emerald-50/50 p-1.5 rounded border border-emerald-100/50">
-                      <div className="text-xs font-black text-emerald-600">
+                    <div className="bg-emerald-50/50 dark:bg-emerald-950/20 p-1.5 rounded border border-emerald-100/50 dark:border-emerald-900/30">
+                      <div className="text-xs font-black text-emerald-600 dark:text-emerald-400">
                         {focusedUserTasks.filter(t=>t.status === "DONE").length}
                       </div>
-                      <div className="text-[8px] text-emerald-500 font-bold uppercase">Pronto</div>
+                      <div className="text-[8px] text-emerald-500 dark:text-emerald-450 font-bold uppercase">Pronto</div>
                     </div>
                   </div>
 
                   {/* Overcapacity Diagnostics warning */}
                   {getUserInProgressCount(focusedUser.id) >= alertThreshold ? (
-                    <div className="rounded-lg bg-red-50 border border-red-150 p-2.5 text-red-800 text-[10px] leading-relaxed flex gap-1.5 items-start">
-                      <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                    <div className="rounded-lg bg-red-50 dark:bg-red-955/20 border border-red-150 dark:border-red-900/40 p-2.5 text-red-800 dark:text-red-300 text-[10px] leading-relaxed flex gap-1.5 items-start">
+                      <AlertTriangle className="h-4 w-4 text-red-650 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-red-900 block font-bold uppercase tracking-wider text-[9px] mb-0.5">⚠️ Sobrecarga Crítica detectada!</strong>
+                        <strong className="text-red-900 dark:text-red-200 block font-bold uppercase tracking-wider text-[9px] mb-0.5">⚠️ Sobrecarga Crítica detectada!</strong>
                         {focusedUser.name} excedeu o limite configurado de {alertThreshold} tarefas em paralelo. Reatribua tarefas imediatamente para evitar gargalos na reunião semanal de segunda-feira.
                       </div>
                     </div>
                   ) : (
-                    <div className="rounded-lg bg-emerald-50 border border-emerald-150 p-2.5 text-emerald-800 text-[10px] leading-relaxed flex gap-1.5 items-start">
-                      <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/10 border border-emerald-150 dark:border-emerald-900/30 p-2.5 text-emerald-800 dark:text-emerald-300 text-[10px] leading-relaxed flex gap-1.5 items-start">
+                      <CheckCircle className="h-4 w-4 text-emerald-650 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-emerald-950 block font-bold uppercase tracking-wider text-[9px] mb-0.5">🔋 Fluxo Fluido / Saudável</strong>
+                        <strong className="text-emerald-950 dark:text-emerald-200 block font-bold uppercase tracking-wider text-[9px] mb-0.5">🔋 Fluxo Fluido / Saudável</strong>
                         Carga de trabalho equilibrada para {focusedUser.name}. Fluxo operacional nominal sem riscos de gargalo imediatos.
                       </div>
                     </div>
@@ -561,15 +561,15 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
 
             {/* Default overview when no specific node clicked */}
             {!selectedNodeType && (
-              <div className="space-y-3.5 text-[11px] text-slate-500 leading-normal">
-                <div className="bg-white p-3.5 rounded-xl border border-slate-200 text-center space-y-2">
+              <div className="space-y-3.5 text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
+                <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 text-center space-y-2 transition-colors">
                   <Network className="h-7 w-7 text-blue-500 mx-auto" />
-                  <p className="font-bold text-slate-700">Analise a Topologia</p>
+                  <p className="font-bold text-slate-705 dark:text-slate-200">Analise a Topologia</p>
                   <p>Clique em qualquer membro da equipe ou satélite de tarefa para visualizar detalhes diagnósticos.</p>
                 </div>
 
-                <div className="border border-dashed border-slate-200 rounded-lg p-3 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-lg p-3 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                     <Activity className="h-3.5 w-3.5 text-blue-500" />
                     <span>Legenda de Cores</span>
                   </div>
@@ -596,7 +596,7 @@ export default function TopologyDashboard({ tasks, users, onTaskClick }: Topolog
             )}
           </div>
 
-          <div className="pt-4 border-t border-slate-200 mt-4 text-[9px] text-slate-400 text-center leading-snug">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 mt-4 text-[9px] text-slate-400 dark:text-slate-500 text-center leading-snug">
             💡 <strong>Dica do Ricardo:</strong> Uma boa topologia reduz o "achismo" em reuniões técnicas.
           </div>
         </div>

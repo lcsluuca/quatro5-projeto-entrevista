@@ -56,7 +56,7 @@ app.get("/api/tasks", async (req, res) => {
 // 3. Create a task
 app.post("/api/tasks", async (req, res) => {
   try {
-    const { title, description, status, dueDate, userId } = req.body;
+    const { title, description, status, dueDate, userId, isHighImpact } = req.body;
     if (!title || !status || !dueDate || !userId) {
       return res.status(400).json({ error: "Campos obrigatórios ausentes" });
     }
@@ -70,6 +70,7 @@ app.post("/api/tasks", async (req, res) => {
         status,
         dueDate: new Date(dueDate),
         userId,
+        isHighImpact: isHighImpact !== undefined ? Boolean(isHighImpact) : false,
         startedAt,
         resolvedAt
       },
@@ -88,7 +89,7 @@ app.post("/api/tasks", async (req, res) => {
 app.put("/api/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, status, dueDate, userId } = req.body;
+    const { title, description, status, dueDate, userId, isHighImpact } = req.body;
     
     // Find first
     const existing = await prisma.task.findUnique({ where: { id } });
@@ -122,6 +123,7 @@ app.put("/api/tasks/:id", async (req, res) => {
         status: status !== undefined ? status : existing.status,
         dueDate: dueDate !== undefined ? new Date(dueDate) : existing.dueDate,
         userId: userId !== undefined ? userId : existing.userId,
+        isHighImpact: isHighImpact !== undefined ? Boolean(isHighImpact) : existing.isHighImpact,
         startedAt: startedAtUpdate !== undefined ? startedAtUpdate : existing.startedAt,
         resolvedAt: resolvedAtUpdate !== undefined ? resolvedAtUpdate : existing.resolvedAt
       },

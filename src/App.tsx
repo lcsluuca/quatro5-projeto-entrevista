@@ -6,6 +6,8 @@ import WorkloadList from "./components/WorkloadList";
 import TaskModal from "./components/TaskModal";
 import TopologyDashboard from "./components/TopologyDashboard";
 import TelemetryDashboard from "./components/TelemetryDashboard";
+import EisenhowerMatrix from "./components/EisenhowerMatrix";
+import ThemeToggle from "./components/ThemeToggle";
 import { 
   Users, 
   Layers, 
@@ -19,7 +21,8 @@ import {
   Network,
   FileText,
   Download,
-  X
+  X,
+  Zap
 } from "lucide-react";
 
 export default function App() {
@@ -30,7 +33,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"kanban" | "topology" | "telemetry">("kanban");
+  const [activeTab, setActiveTab] = useState<"kanban" | "topology" | "telemetry" | "eisenhower">("eisenhower");
   const [tasksVersion, setTasksVersion] = useState(0);
   const [downloadToast, setDownloadToast] = useState<{ id: string; title: string; url: string; userName: string } | null>(null);
 
@@ -140,6 +143,7 @@ export default function App() {
     status: "TODO" | "IN_PROGRESS" | "DONE";
     dueDate: string;
     userId: string;
+    isHighImpact: boolean;
   }) => {
     try {
       if (selectedTask) {
@@ -210,30 +214,31 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-sans text-neutral-800">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 font-sans text-neutral-800 dark:text-slate-200 transition-colors duration-200">
       {/* Visual Navigation Margin Indicator strictly avoided to keep elegant empty background feel */}
-      <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
             {/* Minimalist Logo Quatro5 */}
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white font-extrabold text-[15px] shadow-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 dark:bg-blue-700 text-white font-extrabold text-[15px] shadow-sm">
               Q5
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="text-sm font-bold text-slate-800 tracking-tight">Quatro5</h1>
-                <span className="text-[10px] text-slate-400 font-semibold">|</span>
-                <span className="text-[10px] tracking-wider text-slate-500 font-bold uppercase">Gestão de Time</span>
+                <h1 className="text-sm font-bold text-slate-800 dark:text-slate-150 tracking-tight">Quatro5</h1>
+                <span className="text-[10px] text-slate-400 dark:text-slate-600 font-semibold">|</span>
+                <span className="text-[10px] tracking-wider text-slate-500 dark:text-slate-400 font-bold uppercase">Gestão de Time</span>
               </div>
-              <p className="text-[10px] text-slate-400">Canal exclusivo do Ricardo Santos</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">Canal exclusivo do Ricardo Santos</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <button
               onClick={fetchData}
               disabled={loading}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-slate-600 hover:bg-slate-50 hover:text-slate-850 transition lg:flex lg:items-center lg:gap-1.5 text-xs font-bold cursor-pointer shadow-sm"
+              className="rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-850 dark:hover:text-white transition lg:flex lg:items-center lg:gap-1.5 text-xs font-bold cursor-pointer shadow-sm bg-white dark:bg-slate-900"
             >
               <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
               <span>{loading ? "Sincronizando..." : "Sincronizar"}</span>
@@ -326,8 +331,8 @@ export default function App() {
 
           {/* Elegant Briefing Output card on top of the Dashboard */}
           {briefing && (
-            <div className="rounded-xl border border-blue-150 bg-gradient-to-br from-blue-50/50 to-indigo-50/20 p-5 shadow-sm space-y-3 relative overflow-hidden transition-all duration-300">
-              <div className="absolute top-0 right-0 h-24 w-24 bg-blue-100/30 rounded-full blur-2xl pointer-events-none" />
+            <div className="rounded-xl border border-blue-150 dark:border-blue-900/40 bg-gradient-to-br from-blue-50/50 to-indigo-50/20 dark:from-slate-900 dark:to-slate-950/80 p-5 shadow-sm space-y-3 relative overflow-hidden transition-all duration-300">
+              <div className="absolute top-0 right-0 h-24 w-24 bg-blue-100/30 dark:bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -335,25 +340,25 @@ export default function App() {
                     AI
                   </div>
                   <div>
-                    <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Briefing Inteligente de Segunda-feira</h3>
-                    <p className="text-[10px] text-slate-400">Análise proativa com IA do fluxo de trabalho do time para Ricardo Santos</p>
+                    <h3 className="text-xs font-bold text-slate-800 dark:text-slate-105 uppercase tracking-wider">Briefing Inteligente de Segunda-feira</h3>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500">Análise proativa com IA do fluxo de trabalho do time para Ricardo Santos</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setBriefing(null)}
-                  className="text-slate-400 hover:text-slate-600 text-[10px] uppercase font-bold tracking-wider cursor-pointer"
+                  className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-[10px] uppercase font-bold tracking-wider cursor-pointer transition-colors"
                 >
                   Ocultar
                 </button>
               </div>
 
-              <div className="text-xs text-slate-600 leading-relaxed space-y-3 pt-1">
+              <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-3 pt-1">
                 {briefing.split("\n\n").map((para, i) => {
                   if (para.trim().startsWith("-") || para.trim().startsWith("*")) {
                     return (
                       <ul key={i} className="list-disc pl-4 space-y-1">
                         {para.split("\n").map((line, j) => (
-                          <li key={j} dangerouslySetInnerHTML={{ __html: formatBriefingText(line.replace(/^[-*]\s*/, "")) }} />
+                           <li key={j} dangerouslySetInnerHTML={{ __html: formatBriefingText(line.replace(/^[-*]\s*/, "")) }} />
                         ))}
                       </ul>
                     );
@@ -364,7 +369,7 @@ export default function App() {
                 })}
               </div>
               
-              <div className="text-[9px] text-blue-600/90 font-medium flex items-center gap-1 mt-1 bg-white/60 w-fit px-2.5 py-1 rounded border border-blue-50">
+              <div className="text-[9px] text-blue-600/90 dark:text-blue-400 font-medium flex items-center gap-1 mt-1 bg-white/60 dark:bg-slate-900/60 w-fit px-2.5 py-1 rounded border border-blue-50 dark:border-blue-900/30 transition-colors">
                 💡 <strong>Conselho:</strong> Ricardo, use estas recomendações para conduzir a pauta de segunda-feira com o time sem achismos!
               </div>
             </div>
@@ -400,11 +405,16 @@ export default function App() {
             />
           </div>
 
-          {/* Kanban Board, Topology or Telemetry Column (Weight: 3/4) */}
+          {/* Kanban Board, Topology, Telemetry or Eisenhower Column (Weight: 3/4) */}
           <div className="lg:col-span-3 space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-1">
               <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                {activeTab === "kanban" ? (
+                {activeTab === "eisenhower" ? (
+                  <>
+                    <Zap className="h-3.5 w-3.5 text-amber-500 animate-pulse" /> 
+                    <span>Matriz de Eisenhower (Gravidade Temporal)</span>
+                  </>
+                ) : activeTab === "kanban" ? (
                   <>
                     <Layers className="h-3.5 w-3.5 text-blue-500" /> 
                     <span>Fluxo de Trabalho (Kanban)</span>
@@ -423,35 +433,46 @@ export default function App() {
               </h2>
 
               {/* View Switches */}
-              <div className="flex items-center gap-0.5 bg-slate-200/50 p-0.5 rounded-lg border border-slate-200/50 self-start sm:self-auto">
+              <div className="flex items-center gap-0.5 bg-slate-200/50 dark:bg-slate-900/60 p-0.5 rounded-lg border border-slate-200/50 dark:border-slate-800/80 self-start sm:self-auto flex-wrap transition-colors">
+                <button
+                  onClick={() => setActiveTab("eisenhower")}
+                  className={`px-3 py-1 text-[10px] font-bold rounded-md transition flex items-center gap-1 cursor-pointer ${
+                    activeTab === "eisenhower"
+                      ? "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-xs font-black"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                  }`}
+                >
+                  <Zap className="h-3 w-3 text-amber-500" />
+                  <span>Matriz Eisenhower</span>
+                </button>
                 <button
                   onClick={() => setActiveTab("kanban")}
                   className={`px-3 py-1 text-[10px] font-bold rounded-md transition flex items-center gap-1 cursor-pointer ${
                     activeTab === "kanban"
-                      ? "bg-white text-slate-800 shadow-xs font-black"
-                      : "text-slate-500 hover:text-slate-800"
+                      ? "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-xs font-black"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                   }`}
                 >
-                  <Layers className="h-3 w-3" />
+                  <Layers className="h-3 w-3 text-blue-500" />
                   <span>Quadro Kanban</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("topology")}
                   className={`px-3 py-1 text-[10px] font-bold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === "topology"
-                      ? "bg-white text-slate-800 shadow-xs font-black"
-                      : "text-slate-500 hover:text-slate-800"
+                      ? "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-xs font-black"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                   }`}
                 >
-                  <Network className="h-3 w-3" />
+                  <Network className="h-3 w-3 text-violet-500" />
                   <span>Visualização Topológica</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("telemetry")}
                   className={`px-3 py-1 text-[10px] font-bold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === "telemetry"
-                      ? "bg-slate-850 text-white shadow-xs font-black"
-                      : "text-slate-500 hover:text-slate-800"
+                      ? "bg-slate-850 dark:bg-slate-800 text-white dark:text-slate-100 shadow-xs font-black"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                   }`}
                 >
                   <Activity className="h-3 w-3 text-indigo-400" />
@@ -460,7 +481,14 @@ export default function App() {
               </div>
             </div>
 
-            {activeTab === "kanban" ? (
+            {activeTab === "eisenhower" ? (
+              <EisenhowerMatrix
+                tasks={tasks}
+                users={users}
+                onTaskClick={handleEditTask}
+                onUpdateStatus={handleUpdateTaskStatus}
+              />
+            ) : activeTab === "kanban" ? (
               <KanbanBoard
                 tasks={tasks}
                 users={users}

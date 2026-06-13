@@ -80,9 +80,9 @@ export default function KanbanBoard({
   });
 
   const columns = [
-    { id: "TODO", title: "A Fazer", bg: "bg-slate-50", text: "text-slate-700", border: "border-slate-200" },
-    { id: "IN_PROGRESS", title: "Em Andamento (WIP)", bg: "bg-blue-50/20", text: "text-blue-800", border: "border-blue-100" },
-    { id: "DONE", title: "Concluído", bg: "bg-emerald-50/20", text: "text-emerald-800", border: "border-emerald-100" },
+    { id: "TODO", title: "A Fazer", bg: "bg-slate-50 dark:bg-slate-950", text: "text-slate-700 dark:text-slate-300", border: "border-slate-200 dark:border-slate-800" },
+    { id: "IN_PROGRESS", title: "Em Andamento (WIP)", bg: "bg-blue-50/20 dark:bg-slate-950", text: "text-blue-800 dark:text-blue-300", border: "border-blue-100 dark:border-slate-800" },
+    { id: "DONE", title: "Concluído", bg: "bg-emerald-50/20 dark:bg-slate-950", text: "text-emerald-800 dark:text-emerald-400", border: "border-emerald-100 dark:border-slate-800" },
   ];
 
   const getInitials = (name: string) => {
@@ -119,7 +119,7 @@ export default function KanbanBoard({
   return (
     <div className="space-y-5">
       {/* Filtering status header */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
@@ -127,13 +127,13 @@ export default function KanbanBoard({
             placeholder="Pesquisar por título, descrição ou responsável..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-slate-50/50"
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-slate-50/50 dark:bg-slate-950 transition-colors"
           />
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           {(selectedUserId || currentSlaFilter) && (
-            <span className="text-xs bg-amber-50 text-amber-800 border border-amber-150 px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 shadow-sm">
+            <span className="text-xs bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30 px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 shadow-sm">
               Filtro ativo: {selectedUserId ? "Membro selecionado" : ""}
               {selectedUserId && currentSlaFilter ? " + " : ""}
               {currentSlaFilter === "OVERDUE" ? "Atrasas" : ""}
@@ -169,17 +169,17 @@ export default function KanbanBoard({
               className={`rounded-xl border ${column.border} ${column.bg} p-4 min-h-[520px] flex flex-col space-y-3`}
             >
               {/* Column Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <span className={`text-xs font-bold uppercase tracking-wider ${column.text}`}>
                     {column.title}
                   </span>
-                  <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                  <span className="rounded-full bg-slate-200/80 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-700 dark:text-slate-300">
                     {columnTasks.length}
                   </span>
                 </div>
                 {column.id === "IN_PROGRESS" && columnTasks.length > 2 && (
-                  <span className="text-[9px] text-rose-700 bg-rose-50 rounded-full py-0.5 px-2 font-bold leading-none animate-pulse border border-rose-100 flex items-center gap-0.5">
+                  <span className="text-[9px] text-rose-700 dark:text-rose-450 bg-rose-50 dark:bg-rose-950/40 rounded-full py-0.5 px-2 font-bold leading-none animate-pulse border border-rose-100 dark:border-rose-900/40 flex items-center gap-0.5">
                     <Flame className="h-2.5 w-2.5" />Limite de WIP!
                   </span>
                 )}
@@ -188,8 +188,8 @@ export default function KanbanBoard({
               {/* Tasks List */}
               <div className="flex-1 space-y-3 overflow-y-auto max-h-[600px] pr-1 scrollbar-thin">
                 {columnTasks.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center rounded-lg border border-dashed border-slate-200 bg-slate-50/50 p-4">
-                    <p className="text-xs text-slate-400 font-medium">Nenhuma tarefa aqui</p>
+                  <div className="flex flex-col items-center justify-center py-12 text-center rounded-lg border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/10 p-4 transition-colors">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">Nenhuma tarefa aqui</p>
                   </div>
                 ) : (
                   columnTasks.map((task) => {
@@ -201,7 +201,7 @@ export default function KanbanBoard({
                         key={task.id}
                         draggable
                         onDragStart={(e) => handleDragStart(e, task.id)}
-                        className="group relative rounded-xl bg-white border border-slate-200 p-4 shadow-sm hover:shadow hover:border-blue-400 hover:-translate-y-0.5 transition duration-200 cursor-grab active:cursor-grabbing"
+                        className="group relative rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 shadow-sm hover:shadow hover:border-blue-400 dark:hover:border-blue-500 hover:-translate-y-0.5 transition duration-200 cursor-grab active:cursor-grabbing"
                       >
                         {/* Task User & Menu Row */}
                         <div className="flex items-center justify-between mb-3">
@@ -214,7 +214,7 @@ export default function KanbanBoard({
                             >
                               {getInitials(task.user.name)}
                             </div>
-                            <span className="text-[11px] font-bold text-slate-600 truncate">
+                            <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 truncate">
                               {task.user.name.split(" ")[0]}
                             </span>
                           </div>
@@ -223,14 +223,14 @@ export default function KanbanBoard({
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition duration-150">
                             <button
                               onClick={() => onEditTask(task)}
-                              className="rounded p-1 text-slate-400 hover:text-blue-600 hover:bg-slate-50 transition cursor-pointer"
+                              className="rounded p-1 text-slate-400 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
                               title="Editar tarefa"
                             >
                               <Edit2 className="h-3 w-3" />
                             </button>
                             <button
                               onClick={() => onDeleteTask(task.id)}
-                              className="rounded p-1 text-slate-400 hover:text-rose-600 hover:bg-slate-50 transition cursor-pointer"
+                              className="rounded p-1 text-slate-400 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
                               title="Deletar tarefa"
                             >
                               <Trash2 className="h-3 w-3" />
@@ -239,34 +239,34 @@ export default function KanbanBoard({
                         </div>
 
                         {/* Title & Description */}
-                        <h4 className="text-xs font-bold text-slate-800 line-clamp-1 group-hover:text-blue-600 transition">
+                        <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
                           {task.title}
                         </h4>
                         
                         {task.description && (
-                          <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">
                             {task.description}
                           </p>
                         )}
 
                         {/* Due dates and Column shifts */}
-                        <div className="mt-4 flex items-center justify-between border-t border-slate-50 pt-2.5">
+                        <div className="mt-4 flex items-center justify-between border-t border-slate-50 dark:border-slate-800/60 pt-2.5">
                           {/* Due Date Indicator */}
                           <div>
                             {task.status === "DONE" ? (
-                              <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 border border-emerald-100">
-                                <CheckCircle className="h-2.5 w-2.5 text-emerald-600" /> Pronta
+                              <span className="inline-flex items-center gap-1 rounded bg-emerald-50 dark:bg-emerald-950/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">
+                                <CheckCircle className="h-2.5 w-2.5 text-emerald-600 dark:text-emerald-450" /> Pronta
                               </span>
                             ) : expired ? (
-                              <span className="inline-flex items-center gap-1 rounded bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold text-rose-700 border border-rose-150 animate-pulse">
-                                <AlertTriangle className="h-2.5 w-2.5 text-rose-600" /> {formatDate(task.dueDate)} (Atrasada!)
+                              <span className="inline-flex items-center gap-1 rounded bg-rose-50 dark:bg-rose-950/20 px-1.5 py-0.5 text-[9px] font-bold text-rose-700 dark:text-rose-400 border border-rose-150 dark:border-rose-900/30 animate-pulse">
+                                <AlertTriangle className="h-2.5 w-2.5 text-rose-600 dark:text-rose-450" /> {formatDate(task.dueDate)} (Atrasada!)
                               </span>
                             ) : urgent ? (
-                              <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 border border-amber-150 animate-pulse">
-                                <Clock className="h-2.5 w-2.5 text-amber-600" /> Vence &lt;24h!
+                              <span className="inline-flex items-center gap-1 rounded bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 dark:text-amber-400 border border-amber-150 dark:border-amber-900/30 animate-pulse">
+                                <Clock className="h-2.5 w-2.5 text-amber-600 dark:text-amber-450 animate-pulse" /> Vence &lt;24h!
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 rounded bg-slate-50 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 border border-slate-100">
+                              <span className="inline-flex items-center gap-1 rounded bg-slate-50 dark:bg-slate-950 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-800">
                                 <Calendar className="h-2.5 w-2.5" /> {formatDate(task.dueDate)}
                               </span>
                             )}
@@ -280,7 +280,7 @@ export default function KanbanBoard({
                                   const prev = column.id === "IN_PROGRESS" ? "TODO" : "IN_PROGRESS";
                                   onUpdateTaskStatus(task.id, prev as any);
                                 }}
-                                className="rounded bg-slate-50 border border-slate-200 p-0.5 text-slate-500 hover:bg-slate-100 transition cursor-pointer"
+                                className="rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-0.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                                 title="Mover para esquerda"
                               >
                                 <ChevronLeft className="h-3 w-3" />
@@ -292,7 +292,7 @@ export default function KanbanBoard({
                                   const next = column.id === "TODO" ? "IN_PROGRESS" : "DONE";
                                   onUpdateTaskStatus(task.id, next as any);
                                 }}
-                                className="rounded bg-blue-50 border border-blue-100 p-0.5 text-blue-600 hover:bg-blue-100 transition cursor-pointer"
+                                className="rounded bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 p-0.5 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/10 transition cursor-pointer"
                                 title="Mover para direita"
                               >
                                 <ChevronRight className="h-3 w-3" />

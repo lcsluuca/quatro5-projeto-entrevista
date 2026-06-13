@@ -15,6 +15,7 @@ export interface Task {
   description: string;
   status: "TODO" | "IN_PROGRESS" | "DONE";
   dueDate: string;
+  isHighImpact?: boolean;
   userId: string;
   user: User;
   startedAt?: string;
