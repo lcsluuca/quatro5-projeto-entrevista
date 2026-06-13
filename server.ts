@@ -60,13 +60,18 @@ app.post("/api/tasks", async (req, res) => {
     if (!title || !status || !dueDate || !userId) {
       return res.status(400).json({ error: "Campos obrigatórios ausentes" });
     }
+    const startedAt = status === "IN_PROGRESS" ? new Date() : (status === "DONE" ? new Date() : null);
+    const resolvedAt = status === "DONE" ? new Date() : null;
+
     const task = await prisma.task.create({
       data: {
         title,
         description: description || "",
         status,
         dueDate: new Date(dueDate),
-        userId
+        userId,
+        startedAt,
+        resolvedAt
       },
       include: {
         user: true
@@ -91,6 +96,24 @@ app.put("/api/tasks/:id", async (req, res) => {
       return res.status(404).json({ error: "Tarefa não encontrada" });
     }
 
+    let startedAtUpdate: Date | null | undefined = undefined;
+    let resolvedAtUpdate: Date | null | undefined = undefined;
+
+    if (status !== undefined && status !== existing.status) {
+      if (status === "IN_PROGRESS") {
+        startedAtUpdate = existing.startedAt || new Date();
+        resolvedAtUpdate = null;
+      } else if (status === "DONE") {
+        resolvedAtUpdate = new Date();
+        if (!existing.startedAt) {
+          startedAtUpdate = existing.createdAt;
+        }
+      } else if (status === "TODO") {
+        startedAtUpdate = null;
+        resolvedAtUpdate = null;
+      }
+    }
+
     const updated = await prisma.task.update({
       where: { id },
       data: {
@@ -98,7 +121,9 @@ app.put("/api/tasks/:id", async (req, res) => {
         description: description !== undefined ? description : existing.description,
         status: status !== undefined ? status : existing.status,
         dueDate: dueDate !== undefined ? new Date(dueDate) : existing.dueDate,
-        userId: userId !== undefined ? userId : existing.userId
+        userId: userId !== undefined ? userId : existing.userId,
+        startedAt: startedAtUpdate !== undefined ? startedAtUpdate : existing.startedAt,
+        resolvedAt: resolvedAtUpdate !== undefined ? resolvedAtUpdate : existing.resolvedAt
       },
       include: {
         user: true
@@ -142,6 +167,136 @@ app.delete("/api/tasks/:id", async (req, res) => {
   } catch (error) {
     console.error("Error deleting task:", error);
     res.status(500).json({ error: "Erro ao excluir tarefa" });
+  }
+});
+
+// 5.5 Telemetry and MTTR Metrics for Engineering Data
+app.get("/api/metrics/telemetry", async (req, res) => {
+  try {
+    const tasks = await prisma.task.findMany({
+      include: {
+        user: true
+      }
+    });
+
+    const completedTasks = tasks.filter(t => t.status === "DONE");
+    
+    // 1. Calculate Lead Time (resolvedAt - createdAt)
+    let totalLeadTimeMs = 0;
+    let leadTimeCount = 0;
+
+    for (const t of completedTasks) {
+      if (t.resolvedAt && t.createdAt) {
+        const diff = new Date(t.resolvedAt).getTime() - new Date(t.createdAt).getTime();
+        if (diff >= 0) {
+          totalLeadTimeMs += diff;
+          leadTimeCount++;
+        }
+      }
+    }
+    
+    const avgLeadTimeHours = leadTimeCount > 0 
+      ? parseFloat((totalLeadTimeMs / (1000 * 60 * 60) / leadTimeCount).toFixed(2)) 
+      : 0;
+
+    // 2. Calculate MTTR (resolvedAt - startedAt)
+    let totalMttrMs = 0;
+    let mttrCount = 0;
+
+    for (const t of completedTasks) {
+      if (t.resolvedAt && t.startedAt) {
+        const diff = new Date(t.resolvedAt).getTime() - new Date(t.startedAt).getTime();
+        if (diff >= 0) {
+          totalMttrMs += diff;
+          mttrCount++;
+        }
+      }
+    }
+
+    const avgMttrHours = mttrCount > 0 
+      ? parseFloat((totalMttrMs / (1000 * 60 * 60) / mttrCount).toFixed(2)) 
+      : 0;
+
+    // 3. User Breakdown for MTTR and Lead Time
+    const users = await prisma.user.findMany({
+      include: {
+        tasks: true
+      }
+    });
+
+    const userBreakdown = users.map(u => {
+      const uCompleted = u.tasks.filter(t => t.status === "DONE");
+      
+      let uLeadTimeMs = 0;
+      let uLeadTimeCount = 0;
+      let uMttrMs = 0;
+      let uMttrCount = 0;
+
+      for (const t of uCompleted) {
+        if (t.resolvedAt && t.createdAt) {
+          const diff = new Date(t.resolvedAt).getTime() - new Date(t.createdAt).getTime();
+          if (diff >= 0) {
+            uLeadTimeMs += diff;
+            uLeadTimeCount++;
+          }
+        }
+        if (t.resolvedAt && t.startedAt) {
+          const diff = new Date(t.resolvedAt).getTime() - new Date(t.startedAt).getTime();
+          if (diff >= 0) {
+            uMttrMs += diff;
+            uMttrCount++;
+          }
+        }
+      }
+
+      return {
+        userId: u.id,
+        userName: u.name,
+        role: u.role,
+        avatarColor: u.avatarColor,
+        completedTasksCount: uCompleted.length,
+        avgLeadTimeHours: uLeadTimeCount > 0 ? parseFloat((uLeadTimeMs / (1000 * 60 * 60) / uLeadTimeCount).toFixed(1)) : 0,
+        avgMttrHours: uMttrCount > 0 ? parseFloat((uMttrMs / (1000 * 60 * 60) / uMttrCount).toFixed(1)) : 0,
+      };
+    });
+
+    // 4. Recent Completed Tasks list with telemetry metrics
+    const recentCompleted = completedTasks
+      .sort((a,b) => new Date(b.resolvedAt!).getTime() - new Date(a.resolvedAt!).getTime())
+      .slice(0, 5)
+      .map(t => {
+        const lt = t.resolvedAt && t.createdAt 
+          ? parseFloat(((new Date(t.resolvedAt).getTime() - new Date(t.createdAt).getTime()) / (1000 * 60 * 60)).toFixed(1))
+          : 0;
+        const mttr = t.resolvedAt && t.startedAt
+          ? parseFloat(((new Date(t.resolvedAt).getTime() - new Date(t.startedAt).getTime()) / (1000 * 60 * 60)).toFixed(1))
+          : 0;
+        return {
+          id: t.id,
+          title: t.title,
+          userName: t.user.name,
+          avatarColor: t.user.avatarColor,
+          leadTimeHours: lt,
+          mttrHours: mttr,
+          completedAt: t.resolvedAt
+        };
+      });
+
+    const alertTriggered = avgMttrHours > 48;
+
+    res.json({
+      avgLeadTimeHours,
+      avgMttrHours,
+      completedTasksCount: completedTasks.length,
+      inProgressTasksCount: tasks.filter(t => t.status === "IN_PROGRESS").length,
+      totalTasksCount: tasks.length,
+      alertTriggered,
+      userBreakdown,
+      recentCompletedTasks: recentCompleted
+    });
+  } catch (error) {
+    console.error("Error calculating telemetry metrics:", error);
+    res.status(500).json({ error: "Erro ao carregar telemetria" });
   }
 });
 

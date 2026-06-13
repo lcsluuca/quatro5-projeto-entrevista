@@ -272,6 +272,24 @@ async function main() {
 
   for (const t of tasksData) {
     const assignedUser = users[t.userIndex];
+    
+    // Set startedAt and resolvedAt for seeded data to display authentic data on telemetry dashboard
+    let startedAt: Date | null = null;
+    let resolvedAt: Date | null = null;
+    
+    if (t.status === "IN_PROGRESS") {
+      // Started some days or hours ago
+      startedAt = new Date(t.dueDate);
+      startedAt.setDate(startedAt.getDate() - 3);
+    } else if (t.status === "DONE") {
+      // Started some days ago, completed some days ago
+      startedAt = new Date(t.dueDate);
+      startedAt.setDate(startedAt.getDate() - 5);
+      
+      resolvedAt = new Date(t.dueDate);
+      resolvedAt.setDate(resolvedAt.getDate() - 2);
+    }
+
     const task = await prisma.task.create({
       data: {
         title: t.title,
@@ -279,6 +297,8 @@ async function main() {
         status: t.status,
         dueDate: t.dueDate,
         userId: assignedUser.id,
+        startedAt,
+        resolvedAt
       },
     });
     console.log(`Tarefa criada: ${task.title} designada para ${assignedUser.name}`);

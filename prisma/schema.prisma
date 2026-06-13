@@ -29,6 +29,8 @@ model Task {
   dueDate     DateTime
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt   DateTime?
+  resolvedAt  DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

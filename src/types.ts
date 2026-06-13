@@ -17,6 +17,8 @@ export interface Task {
   dueDate: string;
   userId: string;
   user: User;
+  startedAt?: string;
+  resolvedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

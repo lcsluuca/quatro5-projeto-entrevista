@@ -5,6 +5,7 @@ import KanbanBoard from "./components/KanbanBoard";
 import WorkloadList from "./components/WorkloadList";
 import TaskModal from "./components/TaskModal";
 import TopologyDashboard from "./components/TopologyDashboard";
+import TelemetryDashboard from "./components/TelemetryDashboard";
 import { 
   Users, 
   Layers, 
@@ -29,7 +30,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"kanban" | "topology">("kanban");
+  const [activeTab, setActiveTab] = useState<"kanban" | "topology" | "telemetry">("kanban");
+  const [tasksVersion, setTasksVersion] = useState(0);
   const [downloadToast, setDownloadToast] = useState<{ id: string; title: string; url: string; userName: string } | null>(null);
 
   // Formatting helper for markdown-style bold tags in the briefing
@@ -91,6 +93,7 @@ export default function App() {
       const metricsData: DashboardMetrics = await metricsRes.json();
       setMetrics(metricsData);
 
+      setTasksVersion(prev => prev + 1);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Erro desconhecido ao carregar o sistema");
@@ -397,7 +400,7 @@ export default function App() {
             />
           </div>
 
-          {/* Kanban Board or Topology Column (Weight: 3/4) */}
+          {/* Kanban Board, Topology or Telemetry Column (Weight: 3/4) */}
           <div className="lg:col-span-3 space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-1">
               <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
@@ -406,10 +409,15 @@ export default function App() {
                     <Layers className="h-3.5 w-3.5 text-blue-500" /> 
                     <span>Fluxo de Trabalho (Kanban)</span>
                   </>
-                ) : (
+                ) : activeTab === "topology" ? (
                   <>
                     <Network className="h-3.5 w-3.5 text-violet-500 animate-pulse" /> 
                     <span>Topologia de Rede (WIP Latency)</span>
+                  </>
+                ) : (
+                  <>
+                    <Activity className="h-3.5 w-3.5 text-indigo-550 animate-pulse" /> 
+                    <span>Telemetria Analítica & MTTR</span>
                   </>
                 )}
               </h2>
@@ -418,9 +426,9 @@ export default function App() {
               <div className="flex items-center gap-0.5 bg-slate-200/50 p-0.5 rounded-lg border border-slate-200/50 self-start sm:self-auto">
                 <button
                   onClick={() => setActiveTab("kanban")}
-                  className={`px-3 py-1 text-[10px] font-extrabold rounded-md transition flex items-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1 text-[10px] font-bold rounded-md transition flex items-center gap-1 cursor-pointer ${
                     activeTab === "kanban"
-                      ? "bg-white text-slate-800 shadow-xs"
+                      ? "bg-white text-slate-800 shadow-xs font-black"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
@@ -429,14 +437,25 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setActiveTab("topology")}
-                  className={`px-3 py-1 text-[10px] font-extrabold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1 text-[10px] font-bold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === "topology"
-                      ? "bg-slate-800 text-white shadow-xs"
+                      ? "bg-white text-slate-800 shadow-xs font-black"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
                   <Network className="h-3 w-3" />
                   <span>Visualização Topológica</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("telemetry")}
+                  className={`px-3 py-1 text-[10px] font-bold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
+                    activeTab === "telemetry"
+                      ? "bg-slate-850 text-white shadow-xs font-black"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <Activity className="h-3 w-3 text-indigo-400" />
+                  <span>Métodos & MTTR</span>
                 </button>
               </div>
             </div>
@@ -453,11 +472,15 @@ export default function App() {
                 currentSlaFilter={currentSlaFilter}
                 onClearFilters={handleClearFilters}
               />
-            ) : (
+            ) : activeTab === "topology" ? (
               <TopologyDashboard
                 tasks={tasks}
                 users={users}
                 onTaskClick={handleEditTask}
+              />
+            ) : (
+              <TelemetryDashboard
+                tasksVersion={tasksVersion}
               />
             )}
           </div>
