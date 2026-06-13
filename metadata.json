@@ -1,0 +1,6 @@
+{
+  "name": "Gestão de Atividades Quatro5",
+  "description": "Sistema de gestão de tarefas e Kanban com controle de WIP, alertas de SLA e carga de trabalho para equipes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
