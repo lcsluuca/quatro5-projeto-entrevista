@@ -4,6 +4,7 @@ import Dashboard from "./components/Dashboard";
 import KanbanBoard from "./components/KanbanBoard";
 import WorkloadList from "./components/WorkloadList";
 import TaskModal from "./components/TaskModal";
+import TopologyDashboard from "./components/TopologyDashboard";
 import { 
   Users, 
   Layers, 
@@ -13,7 +14,8 @@ import {
   CheckCircle,
   Briefcase,
   AlertTriangle,
-  Sparkles
+  Sparkles,
+  Network
 } from "lucide-react";
 
 export default function App() {
@@ -24,6 +26,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"kanban" | "topology">("kanban");
 
   // Formatting helper for markdown-style bold tags in the briefing
   const formatBriefingText = (text: string) => {
@@ -332,22 +335,69 @@ export default function App() {
             />
           </div>
 
-          {/* Kanban Board Column (Weight: 3/4) */}
+          {/* Kanban Board or Topology Column (Weight: 3/4) */}
           <div className="lg:col-span-3 space-y-2">
-            <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Layers className="h-3.5 w-3.5 text-blue-500" /> Fluxo de Trabalho (Kanban)
-            </h2>
-            <KanbanBoard
-              tasks={tasks}
-              users={users}
-              onUpdateTaskStatus={handleUpdateTaskStatus}
-              onEditTask={handleEditTask}
-              onDeleteTask={handleDeleteTask}
-              onAddNewTask={handleAddNewTask}
-              selectedUserId={selectedUserId}
-              currentSlaFilter={currentSlaFilter}
-              onClearFilters={handleClearFilters}
-            />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-1">
+              <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                {activeTab === "kanban" ? (
+                  <>
+                    <Layers className="h-3.5 w-3.5 text-blue-500" /> 
+                    <span>Fluxo de Trabalho (Kanban)</span>
+                  </>
+                ) : (
+                  <>
+                    <Network className="h-3.5 w-3.5 text-violet-500 animate-pulse" /> 
+                    <span>Topologia de Rede (WIP Latency)</span>
+                  </>
+                )}
+              </h2>
+
+              {/* View Switches */}
+              <div className="flex items-center gap-0.5 bg-slate-200/50 p-0.5 rounded-lg border border-slate-200/50 self-start sm:self-auto">
+                <button
+                  onClick={() => setActiveTab("kanban")}
+                  className={`px-3 py-1 text-[10px] font-extrabold rounded-md transition flex items-center gap-1 cursor-pointer ${
+                    activeTab === "kanban"
+                      ? "bg-white text-slate-800 shadow-xs"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <Layers className="h-3 w-3" />
+                  <span>Quadro Kanban</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("topology")}
+                  className={`px-3 py-1 text-[10px] font-extrabold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
+                    activeTab === "topology"
+                      ? "bg-slate-800 text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <Network className="h-3 w-3" />
+                  <span>Visualização Topológica</span>
+                </button>
+              </div>
+            </div>
+
+            {activeTab === "kanban" ? (
+              <KanbanBoard
+                tasks={tasks}
+                users={users}
+                onUpdateTaskStatus={handleUpdateTaskStatus}
+                onEditTask={handleEditTask}
+                onDeleteTask={handleDeleteTask}
+                onAddNewTask={handleAddNewTask}
+                selectedUserId={selectedUserId}
+                currentSlaFilter={currentSlaFilter}
+                onClearFilters={handleClearFilters}
+              />
+            ) : (
+              <TopologyDashboard
+                tasks={tasks}
+                users={users}
+                onTaskClick={handleEditTask}
+              />
+            )}
           </div>
         </section>
       </main>
